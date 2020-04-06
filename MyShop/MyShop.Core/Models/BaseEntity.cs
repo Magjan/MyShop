@@ -10,8 +10,10 @@ namespace MyShop.Core.Models
     {
 
         public string Id { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
-        public DateTimeOffset CreatedAt { get; set; }
+      
 
         public BaseEntity() {
             this.Id = Guid.NewGuid().ToString();
