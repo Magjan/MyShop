@@ -37,6 +37,7 @@
     <Reference Include="Google.Protobuf, Version=3.6.1.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Protobuf.3.6.1\lib\net45\Google.Protobuf.dll</HintPath>
     </Reference>
+    <Reference Include="netstandard" />
     <Reference Include="Renci.SshNet, Version=2016.1.0.0, Culture=neutral, PublicKeyToken=1cee9f8bde3db106, processorArchitecture=MSIL">
       <HintPath>..\packages\SSH.NET.2016.1.0\lib\net40\Renci.SshNet.dll</HintPath>
     </Reference>
@@ -70,6 +71,10 @@
     <ProjectReference Include="..\MyShop.Core\MyShop.Core.csproj">
       <Project>{9690c747-eccc-40fc-b462-0cc9c1667801}</Project>
       <Name>MyShop.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MyShop.DataAcess.MySQL\MyShop.DataAcess.MySQL.csproj">
+      <Project>{69D65F08-571C-48FA-A711-9BE9518650E9}</Project>
+      <Name>MyShop.DataAcess.MySQL</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

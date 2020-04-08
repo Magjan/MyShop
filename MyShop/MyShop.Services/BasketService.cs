@@ -1,6 +1,7 @@
 ﻿using MyShop.Core.Contracts;
 using MyShop.Core.Models;
 using MyShop.Core.ViewModel;
+using MyShop.DataAcess.MySQL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,14 +16,16 @@ namespace MyShop.Services
 
         IRepository<Product> ProductContext;
         IRepository<Basket> BasketContext;
+        IRepository<BasketItem> basketItemsContext;
 
 
         public const string basketSessionName = "eCommerceBasket";
 
         public BasketService(IRepository<Product> productContext,
-            IRepository<Basket> basketContext) {
+            IRepository<Basket> basketContext, IRepository<BasketItem> BasketItemsContext) {
             this.ProductContext = productContext;
             this.BasketContext = basketContext;
+            this.basketItemsContext = BasketItemsContext;
         }
 
 
@@ -31,6 +34,8 @@ namespace MyShop.Services
         private Basket GetBasket(HttpContextBase httpContext, bool createifnull) {
 
             HttpCookie cookie = httpContext.Request.Cookies.Get(basketSessionName);
+
+
 
 
             Basket basket = new Basket();
@@ -77,6 +82,8 @@ namespace MyShop.Services
             HttpCookie cookie = new HttpCookie(basketSessionName);
             cookie.Value = basket.Id;
             cookie.Expires = DateTime.Now.AddDays(1);
+            httpContext.Response.Cookies.Add(cookie);
+
 
             return basket;
         }
@@ -113,12 +120,19 @@ namespace MyShop.Services
 
             Basket basket = GetBasket(httpContext, true);
 
-            BasketItem item = basket.BasketItems.FirstOrDefault(i=>i.Id== itemId);
+           
 
-            if (item!=null) {
+            ICollection<BasketItem> items = basketItemsContext.Collection().ToList();
+            BasketItem basketItemToDelete = (from s in items
+                           where s.Id == itemId
+                           select s).FirstOrDefault<BasketItem>();
 
-                basket.BasketItems.Remove(item);
-                BasketContext.Commit();
+            if (basketItemToDelete != null) {
+                items.Remove(basketItemToDelete);
+                basketItemsContext.Delete(itemId);
+                basketItemsContext.Commit();
+                //basket.BasketItems.Remove(item);
+                // BasketContext.Commit();
             }
 
         }
@@ -129,11 +143,14 @@ namespace MyShop.Services
 
             Basket basket = GetBasket(httpContext, false);
 
+            ICollection<BasketItem> items = basketItemsContext.Collection().ToList();
+
 
             if (basket != null)
             {
 
-                var result = (from b in basket.BasketItems
+                var result = (from b in items
+                              where b.BasketId == basket.Id
                               join p in
  ProductContext.Collection() on b.ProductId equals p.Id
                               select
@@ -164,11 +181,14 @@ namespace MyShop.Services
             Basket basket = GetBasket(httpContext, false);
             BasketSummaryViewModel model = new BasketSummaryViewModel(0,0);
 
+            ICollection<BasketItem> items = basketItemsContext.Collection().ToList();
+
             if (basket != null)
             {
-                int? basketCount = (from b in basket.BasketItems select b.Quantity).Sum();
-                decimal? basketTotal = ( from b in basket.BasketItems 
-                                        join p in ProductContext.Collection() on b.ProductId equals p.Id
+                int? basketCount = (from b in items where b.BasketId== basket.Id select b.Quantity).Sum();
+                decimal? basketTotal = ( from b in items
+                                         where b.BasketId == basket.Id
+                                         join p in ProductContext.Collection() on b.ProductId equals p.Id
                                         select b.Quantity*p.Price
                                         ).Sum();
 
