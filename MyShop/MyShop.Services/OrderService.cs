@@ -20,6 +20,13 @@ namespace MyShop.Services
             this.orderContext = OrderContext;
         }
 
+        public decimal getTotal(string Id) {
+            Order order = GetOrder(Id);
+
+            decimal total = (from p in order.OrderItems select p.Price * p.Quantity).Sum();
+            return total;
+        }
+
         public void CreateOrder(Order baseOrder, List<BasketItemViewModel> basketItrems)
         {
 
@@ -41,5 +48,24 @@ namespace MyShop.Services
 
 
         }
+
+
+
+        public List<Order> GetOrderList() {
+            return orderContext.Collection().ToList();
+        }
+
+
+        public Order GetOrder(string Id) {
+            return orderContext.Find(Id);
+        }
+
+
+        public void UpdateOrder(Order updateOrder) {
+            orderContext.Update(updateOrder);
+            orderContext.Commit();
+        }
+
+
     }
 }

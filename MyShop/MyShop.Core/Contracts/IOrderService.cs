@@ -13,8 +13,10 @@ namespace MyShop.Core.Contracts
 
         void CreateOrder(Order baseOrder, List<BasketItemViewModel>  basketItrems);
 
+        List<Order> GetOrderList();
+        Order GetOrder(string Id);
 
-
-
+        void UpdateOrder(Order updateOrder);
+        decimal getTotal(string Id);
     }
 }

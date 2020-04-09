@@ -16,5 +16,8 @@ namespace MyShop.Core.Models
         public string Image { get; set; } 
         public int Quantity { get; set; }
 
+
+      
+
     }
 }
